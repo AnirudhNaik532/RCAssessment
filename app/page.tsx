@@ -23,8 +23,8 @@ export default function Home() {
         if (field.label === 'User Name') {
           return {
             ...field,
-            label: data.title || field.label,
-            description: data.body || field.description,
+            label: data.title ? data.title : field.label,
+            description: data.body ? data.body : field.description,
           };
         }
         return field;

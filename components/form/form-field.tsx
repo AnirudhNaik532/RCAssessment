@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -24,8 +25,6 @@ export function DynamicFormField({
   onInteraction,
   visible = true,
 }: DynamicFormFieldProps) {
-  if (!visible) return null;
-
   const fieldName = field.name || field.label;
 
   const handleChange = (val: any) => {
@@ -33,8 +32,23 @@ export function DynamicFormField({
     onChange(fieldName, val);
   };
 
+  // Framer Motion animations
+  const containerVariants = {
+    hidden: { opacity: 0, y: -10 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+    exit: { opacity: 0, y: -10, transition: { duration: 0.2 } },
+  };
+
+  if (!visible) return null;
+
   return (
-    <div className="space-y-2">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      className="space-y-2"
+    >
       {field.varient === 'Input' && (
         <div className="space-y-1">
           <Label
@@ -44,7 +58,14 @@ export function DynamicFormField({
             {field.label}
           </Label>
           {field.description && (
-            <p className="text-sm text-muted-foreground">{field.description}</p>
+            <motion.p
+              className="text-sm text-muted-foreground"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              {field.description}
+            </motion.p>
           )}
           <Input
             id={fieldName}
@@ -53,12 +74,20 @@ export function DynamicFormField({
             disabled={field.disabled}
             value={value || ''}
             onChange={(e) => {
-              const val = e.target.value;
-              handleChange(field.type === 'number' ? val : e.target.value);
+              const val = field.type === 'number' ? +e.target.value : e.target.value;
+              handleChange(val);
             }}
             className={cn(error && 'border-red-500')}
           />
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && (
+            <motion.p
+              className="text-sm text-red-500"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              {error}
+            </motion.p>
+          )}
         </div>
       )}
 
@@ -79,7 +108,15 @@ export function DynamicFormField({
           >
             {field.label}
           </Label>
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && (
+            <motion.p
+              className="text-sm text-red-500"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              {error}
+            </motion.p>
+          )}
         </div>
       )}
 
@@ -97,15 +134,29 @@ export function DynamicFormField({
             </SelectTrigger>
             <SelectContent>
               {field.options.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
+                <motion.div
+                  key={option.value}
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                >
+                  <SelectItem value={option.value}>{option.label}</SelectItem>
+                </motion.div>
               ))}
             </SelectContent>
           </Select>
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && (
+            <motion.p
+              className="text-sm text-red-500"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              {error}
+            </motion.p>
+          )}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
